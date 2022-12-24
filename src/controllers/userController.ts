@@ -17,5 +17,14 @@ export const userController = {
         } catch (e) {
             next(e);
         }
+    },
+    createUser: async (req:IRequest, res:Response, next:NextFunction):Promise<void> => {
+        try {
+            const user = req.body;
+            const newUser = await userService.createUser(user);
+            res.json(newUser);
+        } catch (e) {
+            next(e);
+        }
     }
 };

@@ -8,9 +8,18 @@ export type UserType = IUser & Document
 const userSchema: Schema = new Schema<IUser>(
     {
         name: { type: String, trim: true, required: true },
-        age: Number,
+        age: {
+            type: Number,
+            min: 15,
+            max: 120,
+            required: true
+        },
         email: {
-            type: String, trim: true, lowercase: true, unique: true, required: true
+            type: String,
+            trim: true,
+            lowercase: true,
+            unique: true,
+            required: true
         },
         password: { type: String, trim: true, required: true },
         phone: { type: String, trim: true, unique: true },

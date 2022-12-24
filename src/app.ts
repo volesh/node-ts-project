@@ -1,12 +1,11 @@
 import express, { NextFunction, Response } from 'express';
 import fileUpload from 'express-fileupload';
-import * as dotenv from 'dotenv';
+import * as mongoose from 'mongoose';
 
 import { apiRouter } from './routes';
 import { envConfig } from './configs/envConfig';
 import { IRequest } from './interfaces';
 
-dotenv.config();
 const app = express();
 
 app.use(express.json());
@@ -23,6 +22,7 @@ app.use((err:any, req:IRequest, res:Response, next:NextFunction) => {
     });
 });
 
-app.listen(envConfig.PORT, () => {
+app.listen(envConfig.PORT, async ():Promise<void> => {
+    await mongoose.connect(envConfig.MONGO_SERVER as string);
     console.log(`working on port ${envConfig.PORT}`);
 });

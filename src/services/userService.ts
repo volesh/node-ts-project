@@ -7,5 +7,8 @@ export const userService = {
     },
     getUserByParams: async (dbField: string, fieldToSearch: string):Promise<IUser|null> => {
         return UserDb.findOne({ [dbField]: fieldToSearch });
+    },
+    createUser: async (user:IUser):Promise<IUser> => {
+        return UserDb.create(user);
     }
 };
