@@ -1,7 +1,7 @@
 import * as bcrypt from 'bcrypt';
 import { ApiError, errors } from '../errors';
 
-export const passwordHelper = {
+export const passwordService = {
     hashPassword: async (pass:string):Promise<string> => bcrypt.hash(pass, 10),
     comparePasswords: async (pass:string, hashPass:string):Promise<void> => {
         const isSame = await bcrypt.compare(pass, hashPass);

@@ -1,8 +1,8 @@
 import { NextFunction, Response } from 'express';
-import { IRequest, IUser } from '../interfaces';
-import { passwordHelper, tokensHelper } from '../helpers';
+import { IAccessToken, IRequest, IUser } from '../interfaces';
+import { passwordService, tokensService } from '../services';
 import { ApiError, errors } from '../errors';
-import { authService } from '../services';
+import { authRepository } from '../reposetories';
 
 export const authController = {
     login: async (req:IRequest, res:Response, next:NextFunction) => {
@@ -10,9 +10,9 @@ export const authController = {
             const { _id, email, password } = req.user as IUser;
             const loginInfo = req.body;
 
-            await passwordHelper.comparePasswords(loginInfo.password, password);
+            await passwordService.comparePasswords(loginInfo.password, password);
 
-            const tokens = tokensHelper.generateAccessTokenPair({ email });
+            const tokens = tokensService.generateAccessTokenPair({ email });
             if (!tokens) {
                 throw new ApiError(
                     errors.UNKNOWN_ERROR.statusCode,
@@ -20,12 +20,24 @@ export const authController = {
                 );
             }
 
-            const tokenPair = await authService.createAccessTokenPair({
-                accessToken: tokens.accessToken,
-                refreshToken: tokens.refreshToken,
+            const tokenPair = await authRepository.createAccessTokenPair({
+                ...tokens,
                 _user_id: _id
             });
             res.json(tokenPair);
+        } catch (e) {
+            next(e);
+        }
+    },
+    refresh: async (req:IRequest, res:Response, next:NextFunction) => {
+        try {
+            const { _user_id: userId } = req.tokenInfo as IAccessToken;
+            const tokens = tokensService.generateAccessTokenPair({ userId });
+            const newTokenPair = await authRepository.createAccessTokenPair({
+                ...tokens,
+                _user_id: userId
+            });
+            res.json(newTokenPair);
         } catch (e) {
             next(e);
         }

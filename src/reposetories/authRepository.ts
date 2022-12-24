@@ -1,11 +1,12 @@
 import * as jwt from 'jsonwebtoken';
+
 import { IAccessToken } from '../interfaces';
 import { AuthDb } from '../models';
 import { tokenTypesEnum } from '../enums';
-import { ApiError, errors } from '../errors';
 import { envConfig } from '../configs/envConfig';
+import { ApiError, errors } from '../errors';
 
-export const authService = {
+export const authRepository = {
     findByParams: async (data:any):Promise<IAccessToken | null> => {
         return AuthDb.findOne(data);
     },

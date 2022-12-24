@@ -1,7 +1,7 @@
 import { NextFunction, Response } from 'express';
 import { isObjectIdOrHexString } from 'mongoose';
 import { IRequest } from '../interfaces';
-import { userService } from '../services';
+import { userRepository } from '../reposetories';
 import { ApiError, errors } from '../errors';
 import { userValidator } from '../validators';
 
@@ -9,7 +9,7 @@ export const userMiddleware = {
     isUserExist: (fieldName: string, findIn = 'body', dbField = fieldName) => async (req:IRequest, res:Response, next:NextFunction):Promise<void> => {
         try {
             const searchParams = req[findIn as keyof typeof req][fieldName];
-            const user = await userService.getUserByParams(dbField, searchParams);
+            const user = await userRepository.getUserByParams(dbField, searchParams);
             if (!user) {
                 throw new ApiError(errors.NOT_FOUND_ERR.statusCode, errors.NOT_FOUND_ERR.message);
             }
@@ -52,6 +52,22 @@ export const userMiddleware = {
         }
     },
 
+    isUserForUpdateValid: (req:IRequest, res:Response, next:NextFunction):void => {
+        try {
+            const userInfo = req.body;
+            const validate = userValidator.userForUpdateValidator.validate(userInfo);
+            if (validate.error) {
+                throw new ApiError(
+                    errors.NOT_VALID_REQUEST_BODY.statusCode,
+                    errors.NOT_VALID_REQUEST_BODY.message
+                );
+            }
+            next();
+        } catch (e) {
+            next(e);
+        }
+    },
+
     isEmailUnique: async (req:IRequest, res:Response, next:NextFunction):Promise<void> => {
         try {
             const { email } = req.body;
@@ -61,7 +77,7 @@ export const userMiddleware = {
                     errors.NOT_VALID_REQUEST_BODY.message
                 );
             }
-            const user = await userService.getUserByParams('email', email);
+            const user = await userRepository.getUserByParams('email', email);
 
             if (user) {
                 throw new ApiError(

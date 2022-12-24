@@ -9,7 +9,6 @@ userRouter.post(
     '/',
     userMiddleware.isNewUserValid,
     userMiddleware.isEmailUnique,
-    authMiddleware.hashPassword,
     userController.createUser
 );
 
@@ -19,6 +18,19 @@ userRouter.get(
     authMiddleware.isAccessTokenValid,
     userMiddleware.isUserExist('userId', 'params', '_id'),
     userController.getById
+);
+userRouter.put(
+    '/:userId',
+    userMiddleware.isUserIdValid,
+    userMiddleware.isUserForUpdateValid,
+    authMiddleware.isAccessTokenValid,
+    userController.updateById
+);
+userRouter.delete(
+    '/:userId',
+    userMiddleware.isUserIdValid,
+    userMiddleware.isUserExist('userId', 'params', '_id'),
+    userController.deleteUser
 );
 
 export {

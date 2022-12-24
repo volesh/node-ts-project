@@ -11,6 +11,16 @@ export const userValidator = {
             .regex(RegExpEnum.EMAIL)
             .required(),
         password: Joi.string().trim().regex(RegExpEnum.PASSWORD).required(),
-        phone: Joi.string().trim().regex(RegExpEnum.PHONE),
+        phone: Joi.string().trim().regex(RegExpEnum.PHONE)
+    }),
+    userForUpdateValidator: Joi.object({
+        name: Joi.string().trim().optional(),
+        age: Joi.number().max(120).min(15).optional(),
+        email: Joi.string()
+            .trim()
+            .lowercase()
+            .regex(RegExpEnum.EMAIL)
+            .optional(),
+        phone: Joi.string().trim().regex(RegExpEnum.PHONE).optional()
     })
 };

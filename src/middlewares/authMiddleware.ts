@@ -1,21 +1,10 @@
 import { NextFunction, Response } from 'express';
-import { IRequest, IUser } from '../interfaces';
-import { passwordHelper } from '../helpers';
+import { IRequest } from '../interfaces';
 import { ApiError, errors } from '../errors';
-import { authService } from '../services';
+import { authRepository } from '../reposetories';
 import { tokenTypesEnum } from '../enums';
 
 export const authMiddleware = {
-    hashPassword: async (req:IRequest, res:Response, next:NextFunction):Promise<void> => {
-        try {
-            const userInfo:IUser = req.body;
-            req.body.password = await passwordHelper.hashPassword(userInfo.password);
-            next();
-        } catch (e) {
-            next(e);
-        }
-    },
-
     isAccessTokenValid: async (req:IRequest, res:Response, next:NextFunction):Promise<void> => {
         try {
             const { userId } = req.params;
@@ -23,11 +12,34 @@ export const authMiddleware = {
             if (!token) {
                 throw new ApiError(errors.NO_TOKEN.statusCode, errors.NO_TOKEN.message);
             }
-            const isToken = await authService.findByParams({ _user_id: userId, accessToken: token });
+            const isToken = await authRepository.findByParams({
+                _user_id: userId,
+                accessToken: token
+            });
             if (!isToken) {
                 throw new ApiError(errors.BAD_TOKEN.statusCode, errors.BAD_TOKEN.message);
             }
-            await authService.checkToken(token, tokenTypesEnum.ACCESS_TOKEN);
+            await authRepository.checkToken(token, tokenTypesEnum.ACCESS_TOKEN);
+            next();
+        } catch (e) {
+            next(e);
+        }
+    },
+
+    isRefreshTokenValid: async (req:IRequest, res:Response, next:NextFunction):Promise<void> => {
+        try {
+            const token = req.get('Authorization');
+            if (!token) {
+                throw new ApiError(errors.NO_TOKEN.statusCode, errors.NO_TOKEN.message);
+            }
+            const isToken = await authRepository.findByParams({
+                refreshToken: token
+            });
+            if (!isToken) {
+                throw new ApiError(errors.BAD_TOKEN.statusCode, errors.BAD_TOKEN.message);
+            }
+            await authRepository.checkToken(token, tokenTypesEnum.REFRESH_TOKEN);
+            req.tokenInfo = isToken;
             next();
         } catch (e) {
             next(e);
