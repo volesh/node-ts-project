@@ -3,8 +3,9 @@ import fileUpload from 'express-fileupload';
 import * as mongoose from 'mongoose';
 
 import { apiRouter } from './routes';
-import { envConfig } from './configs/envConfig';
+import { envConfig } from './configs';
 import { IRequest } from './interfaces';
+import { cronRunner } from './crones';
 
 const app = express();
 
@@ -25,4 +26,5 @@ app.use((err:any, req:IRequest, res:Response, next:NextFunction) => {
 app.listen(envConfig.PORT, async ():Promise<void> => {
     await mongoose.connect(envConfig.MONGO_SERVER as string);
     console.log(`working on port ${envConfig.PORT}`);
+    cronRunner();
 });
