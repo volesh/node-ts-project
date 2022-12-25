@@ -11,5 +11,10 @@ export const tokensService = {
             accessToken,
             refreshToken
         };
+    },
+
+    generateActionToken: (body:any):{actionToken:string} => {
+        const actionToken = jwt.sign(body, envConfig.FORGOT_PASS_KEY_WORD, { expiresIn: '1d' });
+        return { actionToken };
     }
 };

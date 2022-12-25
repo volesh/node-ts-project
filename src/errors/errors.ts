@@ -1,3 +1,5 @@
+import { imageConfig } from '../configs';
+
 export const errors = {
     // 400
     USER_REGISTERED: {
@@ -24,6 +26,14 @@ export const errors = {
         message: 'Wrong email or password',
         statusCode: 400
     },
+    NO_FILE_TO_UPLOAD: {
+        message: 'No file to upload',
+        statusCode: 400
+    },
+    INVALID_FILE_TO_UPLOAD: {
+        message: `Invalid file: max size - ${imageConfig.IMAGE_MAX_SIZE}, available formats: ${imageConfig.IMAGE_MIMETYPES.map((type) => type)}`,
+        statusCode: 400
+    },
     // 401
     BAD_TOKEN: {
         message: 'Something wrong with token',
@@ -41,6 +51,10 @@ export const errors = {
     },
     WRONG_ACTION_TYPE: {
         message: 'Wrong action type',
+        statusCode: 500
+    },
+    WRONG_TEMPLATE: {
+        message: 'Wrong template',
         statusCode: 500
     }
 };

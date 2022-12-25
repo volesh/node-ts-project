@@ -1,6 +1,6 @@
 import express from 'express';
 import { userController } from '../controllers';
-import { authMiddleware, userMiddleware } from '../middlewares';
+import { authMiddleware, fileMiddleware, userMiddleware } from '../middlewares';
 
 const userRouter = express.Router();
 
@@ -31,6 +31,14 @@ userRouter.delete(
     userMiddleware.isUserIdValid,
     userMiddleware.isUserExist('userId', 'params', '_id'),
     userController.deleteUser
+);
+userRouter.patch(
+    '/:userId/avatar',
+    userMiddleware.isUserIdValid,
+    authMiddleware.isAccessTokenValid,
+    fileMiddleware.checkUploadImage,
+    userMiddleware.isUserExist('userId', 'params', '_id'),
+    userController.uploadAvatar
 );
 
 export {

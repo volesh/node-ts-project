@@ -1,17 +1,26 @@
 import * as jwt from 'jsonwebtoken';
 
-import { IAccessToken } from '../interfaces';
-import { AuthDb } from '../models';
+import { IAccessToken, IActionToken } from '../interfaces';
+import { AuthDb, TokenDb } from '../models';
 import { tokenTypesEnum } from '../enums';
 import { envConfig } from '../configs/envConfig';
 import { ApiError, errors } from '../errors';
 
 export const authRepository = {
-    findByParams: async (data:any):Promise<IAccessToken | null> => {
+    findAccessByParams: async (data:any):Promise<IAccessToken | null> => {
         return AuthDb.findOne(data);
+    },
+    findActionByParams: async (token: string, tokenType: string):Promise<IActionToken|null> => {
+        return TokenDb.findOne({ token, tokenType });
     },
     createAccessTokenPair: async (data: Partial<IAccessToken>):Promise<IAccessToken> => {
         return AuthDb.create(data);
+    },
+    createActionToken: async (data: Partial<IActionToken>):Promise<IActionToken> => {
+        return TokenDb.create(data);
+    },
+    deleteActionToken: async (data: Partial<IActionToken>):Promise<IActionToken|null> => {
+        return TokenDb.findOneAndDelete(data);
     },
     checkToken: async (token:string, tokenType:string):Promise<jwt.VerifyErrors|null> => {
         try {

@@ -1,8 +1,9 @@
 import { NextFunction, Response } from 'express';
 import { IRequest, IUser } from '../interfaces';
 import { userRepository } from '../reposetories';
-import { passwordService } from '../services';
+import { passwordService, sendEmail, uploadFile } from '../services';
 import { ApiError, errors } from '../errors';
+import { emailActionsEnum } from '../enums';
 
 export const userController = {
     getAll: async (req:IRequest, res:Response, next:NextFunction):Promise<void> => {
@@ -25,6 +26,7 @@ export const userController = {
             const user = req.body as IUser;
             const hashPassword = await passwordService.hashPassword(user.password);
             const newUser = await userRepository.createUser({ ...user, password: hashPassword });
+            await sendEmail('volesh2@gmail.com', emailActionsEnum.CREATE_ACCOUNT);
             res.json(newUser);
         } catch (e) {
             next(e);
@@ -54,7 +56,20 @@ export const userController = {
     deleteUser: async (req:IRequest, res:Response, next:NextFunction):Promise<void> => {
         try {
             await userRepository.deleteById(req.params.userId);
+            await sendEmail('volesh2@gmail.com', emailActionsEnum.USER_DELETED);
             res.json('User deleted');
+        } catch (e) {
+            next(e);
+        }
+    },
+    uploadAvatar: async (req:IRequest, res:Response, next:NextFunction):Promise<void> => {
+        try {
+            const uploadData = await uploadFile(req.files!.avatar, 'users', req.params.userId);
+            const updatedUser = await userRepository.updateById(
+                req.params.userId,
+                { avatar: uploadData.Location }
+            );
+            res.json(updatedUser);
         } catch (e) {
             next(e);
         }

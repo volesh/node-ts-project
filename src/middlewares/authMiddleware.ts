@@ -12,7 +12,7 @@ export const authMiddleware = {
             if (!token) {
                 throw new ApiError(errors.NO_TOKEN.statusCode, errors.NO_TOKEN.message);
             }
-            const isToken = await authRepository.findByParams({
+            const isToken = await authRepository.findAccessByParams({
                 _user_id: userId,
                 accessToken: token
             });
@@ -32,13 +32,34 @@ export const authMiddleware = {
             if (!token) {
                 throw new ApiError(errors.NO_TOKEN.statusCode, errors.NO_TOKEN.message);
             }
-            const isToken = await authRepository.findByParams({
+            const isToken = await authRepository.findAccessByParams({
                 refreshToken: token
             });
             if (!isToken) {
                 throw new ApiError(errors.BAD_TOKEN.statusCode, errors.BAD_TOKEN.message);
             }
             await authRepository.checkToken(token, tokenTypesEnum.REFRESH_TOKEN);
+            req.tokenInfo = isToken;
+            next();
+        } catch (e) {
+            next(e);
+        }
+    },
+
+    isForgotPassTokenValid: async (req:IRequest, res:Response, next:NextFunction):Promise<void> => {
+        try {
+            const token = req.get('Authorization');
+            if (!token) {
+                throw new ApiError(errors.NO_TOKEN.statusCode, errors.NO_TOKEN.message);
+            }
+            const isToken = await authRepository.findActionByParams(
+                token,
+                tokenTypesEnum.FORGOT_PASS_TOKEN
+            );
+            if (!isToken) {
+                throw new ApiError(errors.BAD_TOKEN.statusCode, errors.BAD_TOKEN.message);
+            }
+            await authRepository.checkToken(token, tokenTypesEnum.FORGOT_PASS_TOKEN);
             req.tokenInfo = isToken;
             next();
         } catch (e) {
