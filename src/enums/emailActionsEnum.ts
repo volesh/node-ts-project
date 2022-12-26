@@ -1,9 +1,5 @@
-// eslint-disable-next-line no-shadow
-export enum emailActionsEnum {
-    // eslint-disable-next-line no-unused-vars
-    CREATE_ACCOUNT = 1,
-    // eslint-disable-next-line no-unused-vars
-    FORGOT_PASS = 2,
-    // eslint-disable-next-line no-unused-vars
-    USER_DELETED = 3
-}
+export const emailActionsEnum = {
+    CREATE_ACCOUNT: 1,
+    FORGOT_PASS: 2,
+    USER_DELETED: 3
+};

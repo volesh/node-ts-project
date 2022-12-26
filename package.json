@@ -27,6 +27,7 @@
     "nodemailer": "^6.8.0",
     "nodemailer-express-handlebars": "^5.0.0",
     "reflect-metadata": "^0.1.13",
+    "twilio": "^3.84.0",
     "uuid": "^9.0.0"
   },
   "devDependencies": {
@@ -42,6 +43,7 @@
     "@types/node": "^18.11.13",
     "@types/nodemailer": "^6.4.7",
     "@types/nodemailer-express-handlebars": "^4.0.2",
+    "@types/twilio": "^3.19.3",
     "@types/uuid": "^9.0.0",
     "@typescript-eslint/eslint-plugin": "^5.46.0",
     "@typescript-eslint/parser": "^5.46.0",

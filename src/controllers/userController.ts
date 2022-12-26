@@ -1,9 +1,11 @@
 import { NextFunction, Response } from 'express';
 import { IRequest, IUser } from '../interfaces';
 import { userRepository } from '../reposetories';
-import { passwordService, sendEmail, uploadFile } from '../services';
+import {
+    passwordService, sendEmail, sendSms, uploadFile
+} from '../services';
 import { ApiError, errors } from '../errors';
-import { emailActionsEnum } from '../enums';
+import { emailActionsEnum, SmsActionsEnum } from '../enums';
 
 export const userController = {
     getAll: async (req:IRequest, res:Response, next:NextFunction):Promise<void> => {
@@ -26,7 +28,10 @@ export const userController = {
             const user = req.body as IUser;
             const hashPassword = await passwordService.hashPassword(user.password);
             const newUser = await userRepository.createUser({ ...user, password: hashPassword });
-            await sendEmail('volesh2@gmail.com', emailActionsEnum.CREATE_ACCOUNT);
+            await Promise.all([
+                sendEmail('volesh2@gmail.com', emailActionsEnum.CREATE_ACCOUNT),
+                sendSms(SmsActionsEnum.USER_CREATED, '+380682443742')
+            ]);
             res.json(newUser);
         } catch (e) {
             next(e);

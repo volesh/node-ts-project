@@ -4,13 +4,12 @@ import path from 'node:path';
 import { SentMessageInfo } from 'nodemailer';
 import Mail from 'nodemailer/lib/mailer';
 import { envConfig } from '../configs';
-import { emailActionsEnum } from '../enums';
 import { emailTemplates } from '../emailTemplates';
 import { ApiError, errors } from '../errors';
 
 export const sendEmail = async (
     receiver:string,
-    emailAction: emailActionsEnum,
+    emailAction: number,
     context:any = {}
 ):Promise<SentMessageInfo> => {
     const transporter = nodemailer.createTransport({
